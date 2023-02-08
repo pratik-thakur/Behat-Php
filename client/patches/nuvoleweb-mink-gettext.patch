@@ -1,0 +1,14 @@
+diff --git a/src/DrupalExtension/Context/SelectFieldContext.php b/src/DrupalExtension/Context/SelectFieldContext.php
+index 6416fab..a653c64
+--- a/src/DrupalExtension/Context/SelectFieldContext.php
++++ b/src/DrupalExtension/Context/SelectFieldContext.php
+@@ -133,7 +133,8 @@ protected function getSelectedOptionByLabel($select, $option_label, $check_selec
+
+     $options = $field->findAll('css', 'option');
+     $options = array_filter($options, function (NodeElement $option) use ($option_label) {
+-      return $option->getText() == $option_label ? $option : FALSE;
++      $value = $option->getText() ?: $option->getHtml();
++      return $value == $option_label ? $option : FALSE;
+     });
+
+     if (!($option = $options ? reset($options) : NULL)) {

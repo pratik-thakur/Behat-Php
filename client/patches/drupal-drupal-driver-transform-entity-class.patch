@@ -1,0 +1,82 @@
+From 65cef912b649ba8149cac380ca76e15f516c2fbc Mon Sep 17 00:00:00 2001
+From: Conan Tran <conan.tran.au@gmail.com>
+Date: Mon, 27 Jan 2020 00:53:17 +1100
+Subject: [PATCH] Transform entity to real class.
+
+---
+ src/Drupal/Driver/BaseDriver.php      | 2 +-
+ src/Drupal/Driver/DriverInterface.php | 6 +++---
+ src/Drupal/Driver/DrupalDriver.php    | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/Drupal/Driver/BaseDriver.php b/src/Drupal/Driver/BaseDriver.php
+index f5e1622..5014712 100644
+--- a/src/Drupal/Driver/BaseDriver.php
++++ b/src/Drupal/Driver/BaseDriver.php
+@@ -170,7 +170,7 @@ abstract class BaseDriver implements DriverInterface {
+   /**
+    * {@inheritdoc}
+    */
+-  public function entityDelete($entity_type, \stdClass $entity) {
++  public function entityDelete($entity_type, $entity) {
+     throw new UnsupportedDriverActionException($this->errorString('delete entities using the generic Entity API'), $this);
+   }
+
+diff --git a/src/Drupal/Driver/DriverInterface.php b/src/Drupal/Driver/DriverInterface.php
+index 6f94b34..9b66d17 100644
+--- a/src/Drupal/Driver/DriverInterface.php
++++ b/src/Drupal/Driver/DriverInterface.php
+@@ -196,10 +196,10 @@ interface DriverInterface {
+    *
+    * @param string $entity_type
+    *   The entity type ID.
+-   * @param object $entity
+-   *   The entity to delete.
++   * @param object $entity
++   *   Fully loaded entity object.
+    */
+-  public function entityDelete($entity_type, \stdClass $entity);
++  public function entityDelete($entity_type, $entity);
+
+   /**
+    * Enable the test mail collector.
+diff --git a/src/Drupal/Driver/DrupalDriver.php b/src/Drupal/Driver/DrupalDriver.php
+index 7c15f0c..cab2a5a 100644
+--- a/src/Drupal/Driver/DrupalDriver.php
++++ b/src/Drupal/Driver/DrupalDriver.php
+@@ -330,7 +330,7 @@ class DrupalDriver implements DriverInterface, SubDriverFinderInterface, Authent
+   /**
+    * {@inheritdoc}
+    */
+-  public function entityDelete($entity_type, \stdClass $entity) {
++  public function entityDelete($entity_type, $entity) {
+     return $this->getCore()->entityDelete($entity_type, $entity);
+   }
+
+--
+2.20.1
+
+From 1dd29a0733cbd8c9360def2e782d46a9dad5ee2c Mon Sep 17 00:00:00 2001
+From: Conan Tran <conan.tran.au@gmail.com>
+Date: Mon, 27 Jan 2020 01:02:53 +1100
+Subject: [PATCH] Updated function param.
+
+---
+ src/Drupal/Driver/DrushDriver.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Drupal/Driver/DrushDriver.php b/src/Drupal/Driver/DrushDriver.php
+index d179e3b..56e7242 100644
+--- a/src/Drupal/Driver/DrushDriver.php
++++ b/src/Drupal/Driver/DrushDriver.php
+@@ -282,7 +282,7 @@ class DrushDriver extends BaseDriver {
+   /**
+    * {@inheritdoc}
+    */
+-  public function entityDelete($entity_type, \StdClass $entity) {
++  public function entityDelete($entity_type, $entity) {
+     $options = [
+       'entity_type' => $entity_type,
+       'entity' => $entity,
+--
+2.20.1

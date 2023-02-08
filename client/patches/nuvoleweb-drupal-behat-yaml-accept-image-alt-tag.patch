@@ -1,0 +1,31 @@
+---
+ src/Driver/Cores/Drupal8.php | 7 +++++++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/Driver/Cores/Drupal8.php b/src/Driver/Cores/Drupal8.php
+index ea70084..fe143a4 100644
+--- a/src/Driver/Cores/Drupal8.php
++++ b/src/Driver/Cores/Drupal8.php
+@@ -243,8 +243,18 @@ public function entityCreate($entity_type, $values, $save = TRUE) {
+           break;
+
+         case 'image':
+-          $entity->{$name}->setValue(['target_id' => $this->saveFile($value)->id()]);
++	         $image_data = explode(';', $value);
++          $entity->{$name}->setValue(['target_id' => $this->saveFile($image_data[0])->id(), 'alt' => @$image_data[1]]);
+           break;
++
++        case 'link':
++          $link_data = explode(';', $value);
++          $entity->{$name}->setValue(['uri' => $link_data[0], 'title' => @$link_data[1]]);
++          break;
++
++        case 'file':
++          $entity->{$name}->setValue(['target_id' => $this->saveFile($value)->id()]);
++	         break;
+       }
+     }
+
+--
+2.17.1
+

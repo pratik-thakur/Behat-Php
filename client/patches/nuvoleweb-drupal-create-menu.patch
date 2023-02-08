@@ -1,0 +1,30 @@
+diff --git a/src/Driver/Cores/Drupal8.php b/src/Driver/Cores/Drupal8.php
+old mode 100644
+new mode 100755
+index 498048b..5fa1aea
+--- a/src/Driver/Cores/Drupal8.php
++++ b/src/Driver/Cores/Drupal8.php
+@@ -198,7 +198,7 @@ public function createMenuStructure($menu_name, $menu_items) {
+         'menu_name' => $menu_name,
+         'weight' => $weight++,
+       ];
+-
++      $values = array_merge($values, $menu_item);
+       // Assign parent item.
+       if ($menu_item['parent']) {
+         $values['parent'] = $menu_item['parent'];
+diff --git a/src/DrupalExtension/Context/MenuContext.php b/src/DrupalExtension/Context/MenuContext.php
+old mode 100644
+new mode 100755
+index 91426e5..bd8ce33
+--- a/src/DrupalExtension/Context/MenuContext.php
++++ b/src/DrupalExtension/Context/MenuContext.php
+@@ -70,7 +70,7 @@ public function assertMenuStructureForContent($menu_name, TableNode $table) {
+    */
+   public function assertMenuStructure($menu_name, TableNode $table) {
+     try {
+-      $this->menuLinks = array_merge($this->menuLinks, $this->getCore()->createMenuStructure($menu_name, $table->getColumnsHash()));
++      $this->menuLinks = array_merge($this->menuLinks, $this->getCore()->createMenuStructure($menu_name, $table));
+     }
+     catch (\InvalidArgumentException $e) {
+       throw new ExpectationException($e->getMessage(), $this->getSession());

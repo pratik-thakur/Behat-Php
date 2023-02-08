@@ -1,0 +1,135 @@
+From c55be34c2ffdacd3b1378e39dba7ce1d0ec2a735 Mon Sep 17 00:00:00 2001
+From: Conan Tran <conan.tran.au@gmail.com>
+Date: Sun, 26 Jan 2020 23:07:49 +1100
+Subject: [PATCH] Added support for creation of configuration entity.
+
+---
+ src/Driver/Cores/Drupal8.php                  | 22 +++++++++
+ src/DrupalExtension/Context/EntityContext.php | 47 +++++++++++++++++++
+ .../Context/RawDrupalContext.php              | 21 +++++++++
+ 3 files changed, 90 insertions(+)
+ create mode 100644 src/DrupalExtension/Context/EntityContext.php
+
+diff --git a/src/Driver/Cores/Drupal8.php b/src/Driver/Cores/Drupal8.php
+index ea70084..02d08ef 100644
+--- a/src/Driver/Cores/Drupal8.php
++++ b/src/Driver/Cores/Drupal8.php
+@@ -255,6 +256,26 @@ public function entityCreate($entity_type, $values, $save = TRUE) {
+     return $entity;
+   }
+
++  /**
++  * Create a configuration entity.
++  *
++  * @param $entity_type
++  * @param $values
++  * @return mixed
++  * @throws \Exception
++  */
++  public function entityConfigCreate($entity_type, $values) {
++    if (empty($entity_type)) {
++  throw new \Exception("You must specify an entity type to create an entity.");
++  }
++    $entity = \Drupal::entityTypeManager()
++    ->getStorage($entity_type)
++    ->create($values);
++    $entity->save();
++
++    return $entity;
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+
+diff --git a/src/DrupalExtension/Context/EntityContext.php b/src/DrupalExtension/Context/EntityContext.php
+new file mode 100644
+index 0000000..fb4d3c3
+--- /dev/null
++++ b/src/DrupalExtension/Context/EntityContext.php
+@@ -0,0 +1,47 @@
++<?php
++
++namespace NuvoleWeb\Drupal\DrupalExtension\Context;
++
++use Behat\Gherkin\Node\PyStringNode;
++use Webmozart\Assert\Assert;
++
++/**
++ * Class EntityContext.
++ *
++ * @package NuvoleWeb\Drupal\DrupalExtension\Context
++ */
++class EntityContext extends RawDrupalContext {
++
++  /**
++   * Create configuration entity type defined in YAML format.
++   *
++   * @param $entity_type
++   * @param \Behat\Gherkin\Node\PyStringNode $string
++   *   The text in yaml format that represents the entity.
++   *
++   * @Given the following config entity :entity_type
++   */
++  public function assertConfigEntityType($entity_type, PyStringNode $string) {
++    $values = $this->getYamlParser()->parse($string);
++    $entity_definitions = \Drupal::entityTypeManager()->getDefinitions();
++
++    // @todo: validate yaml content
++    $message = __METHOD__ . ": No entity of type $entity_type found.";
++    Assert::keyExists($entity_definitions, $entity_type, $message);
++
++    $entity = $this->getCore()->entityConfigCreate($entity_type, $values);
++
++    $this->entities[] = $entity;
++  }
++
++  /**
++   * Get the yaml parser from the behat container.
++   *
++   * @return \NuvoleWeb\Drupal\DrupalExtension\Component\PyStringYamlParser
++   *   The parser.
++   */
++  protected function getYamlParser() {
++    return $this->getContainer()->get('drupal.behat.component.py_string_yaml_parser');
++  }
++
++}
+diff --git a/src/DrupalExtension/Context/RawDrupalContext.php b/src/DrupalExtension/Context/RawDrupalContext.php
+index 1444c6f..44c467e 100644
+--- a/src/DrupalExtension/Context/RawDrupalContext.php
++++ b/src/DrupalExtension/Context/RawDrupalContext.php
+@@ -20,6 +20,13 @@ class RawDrupalContext extends OriginalRawDrupalContext implements ServiceContai
+    */
+   private $container;
+
++  /**
++   * Keep track of entities so they can be cleaned up.
++   *
++   * @var array
++   */
++  protected $entities = array();
++
+   /**
+    * {@inheritdoc}
+    */
+@@ -44,4 +51,18 @@ public function getCore() {
+     return $this->getDriver()->getCore();
+   }
+
++  /**
++   * Remove any created entities.
++   *
++   * @AfterScenario
++   */
++  public function cleanEntities()
++  {
++    // Remove any entities that were created.
++    foreach ($this->entities as $entity) {
++      $this->getDriver()->entityDelete($entity->getEntityTypeId(), $entity);
++    }
++    $this->entities = array();
++  }
++
+ }
+

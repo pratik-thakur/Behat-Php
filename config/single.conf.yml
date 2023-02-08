@@ -1,0 +1,25 @@
+default: 
+    autoload:
+        '': '%paths.base%/../features/bootstrap'
+        # '': '%paths.base%/../clinet/Context'
+    suites:
+        default:
+            # paths: ['../client/patches/druapl-drupal-extension-do-not-check-if-logged-in-after-logging-in']
+            paths: ['../features/single/single.feature']
+            # paths: ['../features/single/test.feature']
+            contexts:
+                - FeatureContext:
+                    parameters:
+                        server: "hub-cloud.browserstack.com"
+                        user: "username"
+                        key: "accesskey"
+
+                        capabilities:
+                            build: "behat-browserstack1"
+                            name: "single_test1"
+                            "browserstack.debug": true
+
+                        environments:
+                            -
+                                browser: "Safari"
+                                os: "OS X"

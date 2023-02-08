@@ -1,0 +1,28 @@
+The Drupal extension's authentication manager checks the user is logged in after
+logging in. In some circumstances, the expected behaviour is the user is NOT
+logged in, after logging in. This patch disables that check.
+diff --git a/src/Drupal/DrupalExtension/Manager/DrupalAuthenticationManager.php b/src/Drupal/DrupalExtension/Manager/DrupalAuthenticationManager.php
+index 642f6a4..1d58694 100644
+--- a/src/Drupal/DrupalExtension/Manager/DrupalAuthenticationManager.php
++++ b/src/Drupal/DrupalExtension/Manager/DrupalAuthenticationManager.php
+@@ -59,13 +59,13 @@ class DrupalAuthenticationManager implements DrupalAuthenticationManagerInterfac
+         // Log in.
+         $submit->click();
+
+-        if (!$this->loggedIn()) {
+-            if (isset($user->role)) {
+-                throw new \Exception(sprintf("Unable to determine if logged in because 'log_out' link cannot be found for user '%s' with role '%s'", $user->name, $user->role));
+-            } else {
+-                throw new \Exception(sprintf("Unable to determine if logged in because 'log_out' link cannot be found for user '%s'", $user->name));
+-            }
+-        }
++        // if (!$this->loggedIn()) {
++        //     if (isset($user->role)) {
++        //         throw new \Exception(sprintf("Unable to determine if logged in because 'log_out' link cannot be found for user '%s' with role '%s'", $user->name, $user->role));
++        //     } else {
++        //         throw new \Exception(sprintf("Unable to determine if logged in because 'log_out' link cannot be found for user '%s'", $user->name));
++        //     }
++        // }
+
+         $this->userManager->setCurrentUser($user);
+     }

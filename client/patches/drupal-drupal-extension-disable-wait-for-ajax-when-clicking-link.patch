@@ -1,0 +1,26 @@
+diff --git a/src/Drupal/DrupalExtension/Context/MinkContext.php b/src/Drupal/DrupalExtension/Context/MinkContext.php
+index dc7200d..68e2716 100644
+--- a/src/Drupal/DrupalExtension/Context/MinkContext.php
++++ b/src/Drupal/DrupalExtension/Context/MinkContext.php
+@@ -94,6 +94,10 @@ class MinkContext extends MinkExtension implements TranslatableContext
+    */
+     public function beforeJavascriptStep($event)
+     {
++        // Do not wait for AJAX to finish before clicking, as
++        // Power BI tends to AJAX very often, indefinitely.
++        return;
++
+         /** @var \Behat\Behat\Hook\Scope\BeforeStepScope $event */
+         // Make sure the feature is registered in case this hook fires before
+         // ::registerFeature() which is also a @BeforeStep. Behat doesn't
+@@ -115,6 +119,10 @@ class MinkContext extends MinkExtension implements TranslatableContext
+    */
+     public function afterJavascriptStep($event)
+     {
++        // Do not wait for AJAX to finish before clicking, as
++        // Power BI tends to AJAX very often, indefinitely.
++        return;
++
+         /** @var \Behat\Behat\Hook\Scope\BeforeStepScope $event */
+         if (!$this->hasTag('javascript')) {
+             return;

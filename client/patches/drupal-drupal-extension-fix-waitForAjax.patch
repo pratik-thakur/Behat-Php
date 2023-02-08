@@ -1,0 +1,16 @@
+diff --git a/src/Drupal/DrupalExtension/Context/MinkContext.php b/src/Drupal/DrupalExtension/Context/MinkContext.php
+index e2ac026..4c67c3d 100644
+--- a/src/Drupal/DrupalExtension/Context/MinkContext.php
++++ b/src/Drupal/DrupalExtension/Context/MinkContext.php
+@@ -150,7 +150,7 @@ class MinkContext extends MinkExtension implements TranslatableContext
+         (typeof jQuery === 'undefined' || (jQuery.active === 0 && jQuery(':animated').length === 0)) &&
+         d7_not_ajaxing && d8_not_ajaxing
+       );
+-    }());
++    }())
+ JS;
+         $ajax_timeout = $this->getMinkParameter('ajax_timeout');
+         $result = $this->getSession()->wait(1000 * $ajax_timeout, $condition);
+--
+2.17.1
+
